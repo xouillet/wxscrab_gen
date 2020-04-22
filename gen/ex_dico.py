@@ -1,6 +1,10 @@
-import dico
-d=dico.dico("../dic/ods5.dawg")
-print d.isMot("papa")
-print d.isMot("pipi")
-print d.isMot("popo")
-print d.isMot("megotes")
+import dic
+d = dic.Dico()
+ret = dic.Dic_init(d, "ods8.dico")
+if not ret:
+    print(dic.isMot(d, "papa"))
+    print(dic.isMot(d, "pipi"))
+    print(dic.isMot(d, "popo"))
+    print(dic.isMot(d, "megotes"))
+else:
+    print("Error:" , ret)
