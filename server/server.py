@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import bottle
-from bottle import route, run, template, static_file, response, abort
+from bottle import route, response
+
 import xml.etree.cElementTree as ET
 import random
 import subprocess
 
 app = application = bottle.Bottle()
-data = {}
 
 @app.route("/gen_part/<dico>")
 @app.route("/gen_part/<dico>/<minpoint:int>")
@@ -40,4 +40,4 @@ def gen_part(dico, minpoint=None, mintour=None, maxtour=None):
     return result
 
 if __name__ == '__main__':
-    run(app, host='0.0.0.0', port=1964)
+    bottle.run(app, host='0.0.0.0', port=1964)
