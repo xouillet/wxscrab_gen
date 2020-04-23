@@ -24,7 +24,7 @@ def gen_part(dico, minpoint=None, mintour=None, maxtour=None):
         num = r.randrange(0,2**32)
         seed = r.randrange(0,2**16)
         print(num, seed)
-        p = subprocess.Popen([pgm, "-d", f"../gen/{dico}.dico", "-n", str(num), "-s", str(seed)], stdout=subprocess.PIPE)
+        p = subprocess.Popen([pgm, "-d", f"../dic/{dico}.dico", "-n", str(num), "-s", str(seed)], stdout=subprocess.PIPE)
         result = p.communicate()[0]
         tree = ET.fromstring(result)
         tot = int(tree.find("resume/total").text)

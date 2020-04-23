@@ -391,7 +391,7 @@ main(int argc, char *argv[])
     Game game ;
     Dico dic ;
     unsigned short int state[3] ;
-    static char* nomdic = "../../wxscrab/dic/ods7.dico" ;
+    static char* nomdic = "../dic/ods8.dico" ;
     unsigned long int seed = time(0) ;
     int noprint = 0;
     int notiret = 0;
