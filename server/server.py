@@ -7,7 +7,12 @@ import xml.etree.cElementTree as ET
 import random
 import subprocess
 
+import dic
+
 app = application = bottle.Bottle()
+
+d = dic.Dico()
+ret = dic.Dic_init(d, "../dic/ods8.dico")
 
 @app.route("/gen_part/<dico>")
 @app.route("/gen_part/<dico>/<minpoint:int>")
@@ -38,6 +43,12 @@ def gen_part(dico, minpoint=None, mintour=None, maxtour=None):
 
     response.content_type = 'text/xml'
     return result
+
+@app.route("/is_mot/<mot>")
+def is_mot(mot):
+    ret = f"""{{"mot": "{mot}", "ok": {"true" if dic.isMot(d, mot) == 1 else "false"}}}"""
+    response.content_type = 'application/json'
+    return ret
 
 if __name__ == '__main__':
     bottle.run(app, host='0.0.0.0', port=1964)
