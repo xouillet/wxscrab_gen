@@ -19,3 +19,6 @@ swapdic
 *.txt
 gen/build
 MANIFEST
+gen/dic.py
+gen/dic_wrap.c
+
