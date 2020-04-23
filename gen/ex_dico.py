@@ -1,6 +1,6 @@
 import dic
 d = dic.Dico()
-ret = dic.Dic_init(d, "ods8.dico")
+ret = dic.Dic_init(d, "../dic/ods8.dico")
 if not ret:
     print(dic.isMot(d, "papa"))
     print(dic.isMot(d, "pipi"))
