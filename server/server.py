@@ -6,18 +6,22 @@ from bottle import route, response
 import xml.etree.cElementTree as ET
 import random
 import subprocess
+import sys
 
 import dic
 
 app = application = bottle.Bottle()
+dico = "ods8"
 
 d = dic.Dico()
-ret = dic.Dic_init(d, "../dic/ods8.dico")
+error = dic.Dic_init(d, f"../dic/{dico}.dico")
+if error:
+    sys.exit(f"Error loading {dico}")
 
-@app.route("/gen_part/<dico>")
-@app.route("/gen_part/<dico>/<minpoint:int>")
-@app.route("/gen_part/<dico>/<minpoint:int>/<mintour:int>/<maxtour:int>")
-def gen_part(dico, minpoint=None, mintour=None, maxtour=None):
+@app.route("/gen_part")
+@app.route("/gen_part/<minpoint:int>")
+@app.route("/gen_part/<minpoint:int>/<mintour:int>/<maxtour:int>")
+def gen_part(minpoint=None, mintour=None, maxtour=None):
     minpoint = 800 if minpoint is None else int(minpoint)
     mintour = 15 if mintour is None else int(mintour)
     maxtour = 30 if maxtour is None else int(maxtour)
