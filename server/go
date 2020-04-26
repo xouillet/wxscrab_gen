@@ -1,0 +1,1 @@
+gunicorn3 --bind localhost:1964 --workers=4 wsgi:app

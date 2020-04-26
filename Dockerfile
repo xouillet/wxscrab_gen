@@ -1,6 +1,6 @@
 FROM alpine:3.11.5
 
-RUN apk --update add musl-dev gcc python3 python3-dev scons swig py3-bottle
+RUN apk --update add musl-dev gcc python3 python3-dev scons swig py3-bottle py3-gunicorn
 COPY . /app
 RUN	ln -sf /usr/bin/python3 /usr/bin/python ;\
     cd /app/gen ;\
