@@ -2,4 +2,4 @@
 cd gen
 swig -python dic.i
 python3 setup.py install --user
-# cp dist/dic-2.0.0.tar.gz ~/wxscrab/python
+scons
