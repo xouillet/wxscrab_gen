@@ -33,7 +33,6 @@ void print_header(Dictionary dic)
 
 void print_dic_hex(Dictionary dic)
 {
-    printf("%d\n", dic->nedges);
 	for (int i = 0; i < dic->nedges + 1; i++) {
 	    Dawg_edge* e = dic->dawg + i;
 	    printf("%2d ptr=%2d t=%d l=%d f=%d chr=%d (%c)\n",
@@ -111,6 +110,7 @@ int main(int argc, char *argv[])
 		print_header(&dic);
 	}
 	if (option_print_dic_hex) {
+		print_header(&dic);
 		print_dic_hex(&dic);
 	}
 	if (option_print_dic_list) {
