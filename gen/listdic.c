@@ -42,26 +42,21 @@ void print_dic_hex(Dictionary dic)
 }
 
 static void
-print_dic_rec(FILE* out, Dictionary dic, char *buf, char *s, Dawg_edge* i)
+print_dic_list(FILE* out, Dictionary dic, char *buf, char *s, Dawg_edge* i)
 {
 	if (i->term) {		/* edge points at a complete word */
 		*s = '\0';
-		fprintf(out, "%s\n", buf);
+		fputs(buf, out);
+		fputs("\n", out);
 	}
 	if (i->ptr) {		/* Compute index: is it non-zero ? */
 		Dawg_edge* p = dic->dawg + i->ptr;
 		do {		/* for each edge out of this node */
 			*s = p->chr + 'a' - 1;
-			print_dic_rec(out, dic, buf, s + 1, p);
+			print_dic_list(out, dic, buf, s + 1, p);
 		}
 		while (!(*p++).last);
 	}
-}
-
-void print_dic_list(Dictionary dic)
-{
-	static char buf[80];
-	print_dic_rec(stdout, dic, buf, buf, dic->dawg + dic->root);
 }
 
 void usage(char *name)
@@ -78,6 +73,7 @@ int main(int argc, char *argv[])
 	int option_print_header = 0;
 	int option_print_dic_hex = 0;
 	int option_print_dic_list = 0;
+	static char buf[80];
 
 	if (argc < 2) {
 		usage(argv[0]);
@@ -118,7 +114,7 @@ int main(int argc, char *argv[])
 		print_dic_hex(&dic);
 	}
 	if (option_print_dic_list) {
-		print_dic_list(&dic);
+	    print_dic_list(stdout, &dic, buf, buf, dic.dawg + dic.root);
 	}
 	return 0;
 }
