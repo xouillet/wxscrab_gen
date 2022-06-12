@@ -12,14 +12,14 @@ uint32_t bswap32(uint32_t x)
         ((x >> 24) & 0x000000ff );
 }
 
-uint32_t bswap32p(uint32_t x)
-{
-    return ((x << 16) & 0xff000000 ) |
-        ((x >> 16) & 0x0000ff00 ) |
-        (x  & 0x00ff00ff );
-}
-
-uint32_t reverse(uint32_t x)
+//uint32_t bswap32p(uint32_t x)
+//{
+//    return ((x << 16) & 0xff000000 ) |
+//        ((x >> 16) & 0x0000ff00 ) |
+//        (x  & 0x00ff00ff );
+//}
+//
+uint32_t reverse32(uint32_t x)
 {
     x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
     x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
@@ -29,17 +29,27 @@ uint32_t reverse(uint32_t x)
     return x;
 }
 
-unsigned char reverse_b(unsigned char b) {
-    char rev = 0;
-    int i = 0;
+// byte 76543210 -> 01276543
+unsigned char swap_bits(unsigned char b) {
+    unsigned char i = 1;
+    // bit 0 -> 7
+    unsigned char rev = b << 7;
+    // bit 1 -> 6
     rev |= ((b>>i) & 1)<<(7-i);
-    i = 1;
+    // bit 2 -> 5
+    i++;
     rev |= ((b>>i) & 1)<<(7-i);
-    i = 2;
-    rev |= ((b>>i) & 1)<<(7-i);
+    // copy 76543 -> 43210
     rev |= b >> 3 & 0b00011111;
     return rev;
 }
+//
+//unsigned char reverse8(unsigned char b) {
+//   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+//   b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+//   b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+//   return b;
+//}
 
 int main(int argc, char* argv[]) {
     FILE *f = fopen(argv[1], "rb");
@@ -48,7 +58,7 @@ int main(int argc, char* argv[]) {
     printf("Size: %ld\n", fsize);
     rewind(f);
 
-    char *buff = malloc(fsize);
+    unsigned char *buff = malloc(fsize);
     if (fread(buff, fsize, 1, f) != 1) {
         puts("Error");
         fclose(f);
@@ -62,14 +72,16 @@ int main(int argc, char* argv[]) {
         p[i] = bswap32(p[i]);
     }
     for (uint32_t i=8; i < fsize / 4; i++) {
-		char* pc = (char*)(p+i);
-        char temp = pc[0];
+		unsigned char* pc = (unsigned char*)(p+i);
+        unsigned char temp = pc[0];
         pc[0] = pc[2];
         pc[2] = temp;
-		pc[3] = reverse_b(pc[3]);
+		pc[3] = swap_bits(pc[3]);
     }
 
-    strncpy(buff, _COMPIL_KEYWORD_, sizeof( _COMPIL_KEYWORD_));
+    for (uint8_t i=0; i < sizeof(_COMPIL_KEYWORD_); i++) {
+       buff[i] = _COMPIL_KEYWORD_[i];
+    }
 
     FILE *g = fopen(argv[2], "wb");
     fwrite(buff, fsize, 1, g);
