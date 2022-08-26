@@ -1,4 +1,4 @@
-FROM alpine:3.11.5
+FROM alpine:3.15
 
 RUN apk --update add musl-dev gcc python3 python3-dev scons swig py3-bottle py3-gunicorn
 COPY . /app
