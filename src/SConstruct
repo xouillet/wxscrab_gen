@@ -2,6 +2,7 @@ env = Environment(CCFLAGS = '-O2')
 system = ARGUMENTS.get('system', 0)
 if int(system):
     env.Append(CCFLAGS = ' -DDEFAULT_DIC_PATH=\\"/usr/share/wxscrab/dic/ods8.dico\\"')
+env.ParseConfig("pkg-config libmicrohttpd --cflags --libs")
 
 gen_part = env.Program(['gen_part.c','bag.c','board.c', 'board_cross.c', 'board_search.c', 'dic.c',
     'game.c', 'getopt.c', 'pldrack.c', 'rack.c', 'results.c',
@@ -9,10 +10,12 @@ gen_part = env.Program(['gen_part.c','bag.c','board.c', 'board_cross.c', 'board_
 listdic = env.Program(['listdic.c', 'dic.c'])
 compdic = env.Program(['compdic.c', 'hashtable.c'])
 swapdic = env.Program(['swapdic.c'])
+server = env.Program(['server.c'])
 
 env.Install('/usr/bin', gen_part)
 env.Install('/usr/bin', listdic)
 env.Install('/usr/bin', compdic)
 env.Install('/usr/bin', swapdic)
+env.InstallAs('/usr/bin/scrab_server', server)
 
 env.Alias('install', '/usr/bin')
