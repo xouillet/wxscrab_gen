@@ -35,6 +35,10 @@
 #include "game_internals.h"
 #include "gen_part.h"
 
+#ifndef DEFAULT_DIC_PATH
+#define DEFAULT_DIC_PATH "../dic/ods8.dico"
+#endif
+
 int verbeux = 0;
 int use_best = 1;
 FILE* out = NULL;
@@ -374,7 +378,7 @@ help()
     puts ("d'après Eliot - Antoine FRABOULET - sous license GPL") ;
     puts ("");
     puts ("Utilisation : gen_part [-d dictionnaire] [-n numéro] [-s seed] [-v] [-q] [-h]") ;
-    puts ("        -d : fichier dawg contenant le dictionnaire (par défaut : ../dic/ods7.dawg)");
+    puts ("        -d : fichier dawg contenant le dictionnaire (par défaut : " DEFAULT_DIC_PATH ")");
     puts ("        -n : numéro de la partie à générer ; par défaut, utilise time(0)");
     puts ("        -s : seed, valeur de la variante  ; par défaut, 47482");
     puts ("        -q : n'imprime que les statistiques de la partie");
@@ -391,7 +395,7 @@ main(int argc, char *argv[])
     Game game ;
     Dico dic ;
     unsigned short int state[3] ;
-    static char* nomdic = "../dic/ods8.dico" ;
+    static char* nomdic = DEFAULT_DIC_PATH ;
     unsigned long int seed = time(0) ;
     int noprint = 0;
     int notiret = 0;
