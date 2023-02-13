@@ -246,7 +246,5 @@ Board_calc_scrab_tiles(tile_t tiles[BOARD_REALDIM][BOARD_REALDIM])
 int
 Board_calc_scrab(Board b)
 {
-// printf("nb scrab R : %d\n",Board_calc_scrab_tiles(b->tiles_r)) ;
-// printf("nb scrab C : %d\n",Board_calc_scrab_tiles(b->tiles_c)) ;
     return Board_calc_scrab_tiles(b->tiles_r) + Board_calc_scrab_tiles(b->tiles_c) ;
 }

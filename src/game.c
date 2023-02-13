@@ -293,41 +293,26 @@ Game_getcalc_scrab(Game g)
 
 
 int
-Game_setrack_random(Game game, unsigned short int etat[3], int force_vide)
+Game_setrack_random_retry(Game game, set_rack_mode mode, unsigned short int xsubi[3])
 {
-    // retour :
-    // -1 si pb définitif lié au sac
-    // 0 si OK
-    // 1 si OK après retirage
-
     Playedrack p = game->playedracks[game->nrounds] ;
-    int retour = 0 ;
-    int res ;
-    if (force_vide)
-        res = Game_setrack_random_aux(game, p, RACK_ALL, etat) ;
-    else
-        res = Game_setrack_random_aux(game, p, RACK_NEW, etat) ;
-    if (res == 1) {
-        retour = 1 ;
-        while ((res = Game_setrack_random_aux(game,p,RACK_ALL,etat)) != 0) ;
-    } else if (res >= 2) {
-        retour = -1 ;
+    int r = Game_setrack_random_aux(game, p, mode, xsubi);
+
+    if (r != 1) {
+        return (r >= 2)? -1 : 0;
+    } else {
+        while ((r = Game_setrack_random_aux(game, p, RACK_ALL, xsubi)) == 1);
+        return (r >= 2)? -1 : 1;
     }
-    return retour ;
 }
 
 int
-Game_setrack_random_aux(Game game, Playedrack p, set_rack_mode mode, unsigned short int etat[3])
+Game_setrack_random_aux(Game game, Playedrack p, set_rack_mode mode, unsigned short int xsubi[3])
 {
-    // retour :
-    // 0 si OK
-    // 1 si mauvais nb voyelles/consonnes
-    // 2 si sac vide
-    // 3 si plus assez voy/cons dans sac
-    //
-    int i,min,nold;
+    int i,nold;
     tile_t l;
     Bag b;
+    int min_vowels_consonants;
 
     /* create a copy of the bag in which we can do everything we want */
     b = Bag_create();
@@ -339,43 +324,42 @@ Game_setrack_random_aux(Game game, Playedrack p, set_rack_mode mode, unsigned sh
         return 2;
     }
 
-    min = Game_getnrounds(game)<15 ? 2 : 1 ;
+    min_vowels_consonants = Game_getnrounds(game)<15 ? 2 : 1 ;
 
-    /* pas assez de consonnes ou de voyelles et plus de joker*/
-    if ((Bag_nvowels(b) < min || Bag_nconsonants(b) < min) && (Bag_njoker(b) == 0)) {
+    /* Not enough vowels/consonants in bag to generate a proper rack */
+    if ((Bag_nvowels(b) < min_vowels_consonants || Bag_nconsonants(b) < min_vowels_consonants) && (Bag_njoker(b) == 0)) {
         Bag_destroy(b);
         return 3;
     }
 
     nold = Playedrack_nold(p);
 
-    /* si rack vide ou mode RACK_ALL*/
+    /* If RACK_ALL is specified or empty rack */
     if (mode == RACK_ALL || nold == 0) {
         Playedrack_init(p);
         for (i=0; Bag_ntiles(b)!=0 && i<RACK_MAX; i++) {
-            l = Bag_select_random(b,etat);
+            l = Bag_select_random(b,xsubi);
             Bag_taketile(b,l);
             Playedrack_addold(p,l);
         }
     } else {
-        /* on complète un rack */
         /* we flush the "new" part of the rack */
         Playedrack_resetnew(p);
 
-        /* retirer les "old" lettres du bag */
+        /* we re-take the old tiles from the bag */
         for(i=0; i<nold; i++) {
             Bag_taketile(b,Playedrack_oldtiles(p,i)) ;
         }
 
         /* take new tiles from the bag */
         for (i=nold; Bag_ntiles(b)!=0 && i<RACK_MAX; i++) {
-            l = Bag_select_random(b,etat);
+            l = Bag_select_random(b,xsubi);
             Bag_taketile(b,l);
             Playedrack_addnew(p,l);
         }
     }
     Bag_destroy(b);
-    return Playedrack_check_rack(p, min) ;
+    return Playedrack_check_rack(p, min_vowels_consonants) ;
 }
 
 int

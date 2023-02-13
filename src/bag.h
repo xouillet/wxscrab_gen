@@ -73,10 +73,11 @@ int   Bag_nconsonants (Bag b);
   /*************************
    * return a random available tile
    * the tile is not taken out of the bag.
+   * xsubi is the argument to nrand48 randomizer
    * returns 0 on failure
    *************************/
 
-tile_t Bag_select_random(Bag b,unsigned short int etat[3]);
+tile_t Bag_select_random(Bag b, unsigned short int xsubi[3]);
 void  Bag_print    (Bag b);
 
 #if defined(__cplusplus)

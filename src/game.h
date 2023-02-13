@@ -114,25 +114,39 @@ int  Game_getpoints           (Game);
   /*************************
    * Set the rack for searching
    *
-   * the int parameter is a boolean, if this parameter
    * set the rack will check that there are at least
    * 2 vowels and 2 consonants before the round 15.
+   *
+   * mode can be either RACK_ALL to set all the rack (clean rack)
+   * or RACK_NEW to only take new letters to complete the rack
+   *
+   * xsubi is the argument to nrand48 randomizer
    *
    * The setrack_manual parameter string has to contain
    * 'a' <= char <= 'z' or 'A' <= char <= 'Z' or '?'
    *
    * return value
-   *    0 : the rack has been set
-   *    1 : the bag does not contain enough tiles
-   *    2 : the rack check was set on and failed
-   *    3 : the rack cannot be completed (Game_setrack_random only)
+   *    0 : the rack has been set and is correct
+   *    1 : the rack has been set but does not fit vowels/consonants rules
+   *    2 : the bag is empty
+   *    3 : the bag has not enough vowels/consonnants to generate a correct rack
    *************************/
 
 #define RACK_MAX 7
 typedef enum {RACK_ALL, RACK_NEW} set_rack_mode;
 
-int  Game_setrack_random       (Game,unsigned short int etat[3], int force_vide);
-int  Game_setrack_random_aux   (Game,Playedrack,set_rack_mode,unsigned short int etat[3]);
+int  Game_setrack_random_aux   (Game game,Playedrack,set_rack_mode, unsigned short int xsubi[3]);
+
+   /***************************
+    * Set the rack for searching multiple times until we get
+    * a correct rack
+    *
+    * return value
+    *   0: the rack has been set and was correct on the first try
+    *   1: the rack has been set but needed 2 or more attemps
+    *   -1: the rack is incorect, no solution is possible (empty bag or equivalent)
+    */
+int  Game_setrack_random_retry (Game game,set_rack_mode mode,unsigned short int xsubi[3]);
 
   /*************************
    * Get the number of tile available in the bag.

@@ -132,10 +132,10 @@ Bag_replacetile(Bag b, tile_t t)
 }
 
 tile_t
-Bag_select_random(Bag b, unsigned short int etat[3])
+Bag_select_random(Bag b, unsigned short int xsubi[3])
 {
     int i;
-    int n = (int)(nrand48(etat) % b->ntiles);
+    int n = (int)(nrand48(xsubi) % b->ntiles);
     if (n < b->ntiles) {
         for (i = 1; i < TILES_NUMBER; i++) {
             if (n < b->tiles[i])

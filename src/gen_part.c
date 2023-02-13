@@ -129,7 +129,7 @@ print_line(Game game, int num, int nbisotop, int change_tirage, int notiret, int
 }
 
 score
-traite(Game game, int num, unsigned short int state[3])
+traite(Game game, int num, unsigned short int xsubi[3])
 {
     if (verbeux >=1) {
         char mot[WORD_SIZE_MAX] ;
@@ -141,7 +141,7 @@ traite(Game game, int num, unsigned short int state[3])
     score w_score ;
     w_score.cross = traite_cross(game,num) ;
     if (use_best) {
-        w_score.best = traite_best(game,num,state);
+        w_score.best = traite_best(game,num,xsubi);
     }
     w_score.scrab = traite_scrab(game,num) ;
     w_score.pc    = traite_pc(game,num) ;
@@ -224,7 +224,7 @@ traite_pc(Game game, int num)
 }
 
 score_best
-traite_best(Game game, int num, unsigned short int state[3])
+traite_best(Game game, int num, unsigned short int xsubi[3])
 {
     int i;
     score_best sscore ;
@@ -234,7 +234,7 @@ traite_best(Game game, int num, unsigned short int state[3])
 
     /* sauve le contexte rand */
     for (i=0 ; i<3 ; i++) {
-        contexte[i] = state[i] ;
+        contexte[i] = xsubi[i] ;
     }
 
     /* Fait une copie de game dans g pour faire ce qu'on veut */
@@ -242,7 +242,7 @@ traite_best(Game game, int num, unsigned short int state[3])
     Game_copy_n(g,game) ;
     /* joue le round num dans la copie de game */
     Game_play_round(g,Results_get(game->searchresults,num)) ;
-    tir = Game_setrack_random(g, state, 0) ;
+    tir = Game_setrack_random_retry(g, RACK_NEW, xsubi) ;
     if (tir >= 2) {
         sscore.pts = 0 ;
         sscore.nb  = 0 ;
@@ -279,7 +279,7 @@ fin:
     Game_destroy(g) ;
     /* restaure le contexte random */
     for (i=0 ; i<3 ; i++) {
-        state[i]=contexte[i] ;
+        xsubi[i]=contexte[i] ;
     }
     return sscore ;
 }
@@ -296,7 +296,7 @@ fin_partie (Game game, int noprint, int nbscrab, int maxisotop)
 }
 
 int
-main_loop(Game game,int noprint, int notiret, int nbessai, unsigned short int state[3])
+main_loop(Game game,int noprint, int notiret, int nbessai, unsigned short int xsubi[3])
 {
     int nbscrab = 0;
     int nbisotop = 0 ;
@@ -309,7 +309,7 @@ main_loop(Game game,int noprint, int notiret, int nbessai, unsigned short int st
         score w_score ;
         score t_score ;
         int change_tirage = 0 ;
-        res = Game_setrack_random(game, state, 0) ;
+        res = Game_setrack_random_retry(game, RACK_NEW, xsubi) ;
         // -1 = problème définitif lié au sac
         if (res == -1) {
             fin_partie(game,noprint,nbscrab,maxisotop) ;
@@ -330,7 +330,7 @@ main_loop(Game game,int noprint, int notiret, int nbessai, unsigned short int st
                 Game_getplayedrack(game,Game_getnrounds(game),tirage) ;
                 fprintf(out,"<essai_tirage>%s</essai_tirage>\n",tirage) ;
             }
-            Game_setrack_random(game, state, 1) ;
+            Game_setrack_random_retry(game, RACK_ALL, xsubi) ;
             Game_search(game);
         }
 
@@ -350,9 +350,9 @@ main_loop(Game game,int noprint, int notiret, int nbessai, unsigned short int st
             Game_play(game, 0) ;
         } else {
             joue = 0 ;
-            w_score = traite(game,0,state);
+            w_score = traite(game,0,xsubi);
             for (i = 1; i<nbisotop; i++) {
-                if ( cmp_score(t_score=traite(game,i,state), w_score) > 0 ) {
+                if ( cmp_score(t_score=traite(game,i,xsubi), w_score) > 0 ) {
                     w_score = t_score ;
                     joue = i;
                 }
@@ -394,7 +394,7 @@ main(int argc, char *argv[])
 {
     Game game ;
     Dico dic ;
-    unsigned short int state[3] ;
+    unsigned short int xsubi[3] ;
     static char* nomdic = DEFAULT_DIC_PATH ;
     unsigned long int seed = time(0) ;
     int noprint = 0;
@@ -405,7 +405,7 @@ main(int argc, char *argv[])
     out = stdout;
 
     srand48(0);
-    state[2] = 0xB97A ;
+    xsubi[2] = 0xB97A ;
 
     opterr = 0;
     while ((c = getopt (argc, argv, "o:bqd:n:s:e:vht")) != -1) {
@@ -414,7 +414,7 @@ main(int argc, char *argv[])
                 verbeux++;
                 break;
             case 's':
-                state[2]= atoi(optarg);
+                xsubi[2]= atoi(optarg);
                 break;
             case 'e':
                 nbessai = atoi(optarg);
@@ -497,17 +497,17 @@ main(int argc, char *argv[])
             break;
     }
 
-    state[0] = seed>>16 ;
-    state[1] = seed&0x0000FFFF ;
+    xsubi[0] = seed>>16 ;
+    xsubi[1] = seed&0x0000FFFF ;
 
     fprintf(out,"<?xml version=\"1.0\"?>\n");
     fprintf(out,"<partie ");
     fprintf(out,"num=\"%lu\" ",seed);
-    fprintf(out,"seed=\"%u\" ",state[2]);
+    fprintf(out,"seed=\"%u\" ",xsubi[2]);
     fprintf(out,"dic=\"%s\" >\n",nomdic) ;
 
     game = Game_create(&dic);
-    main_loop(game,noprint,notiret,nbessai,state);
+    main_loop(game,noprint,notiret,nbessai,xsubi);
     fclose(out);
     Game_destroy(game);
     Dic_destroy(&dic);
